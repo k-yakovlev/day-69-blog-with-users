@@ -1,15 +1,17 @@
+import os
+from datetime import date
+from functools import wraps
+
 from flask import Flask, render_template, redirect, url_for, flash, request, abort
 from flask_bootstrap import Bootstrap
 from flask_ckeditor import CKEditor
-from datetime import date
-from werkzeug.security import generate_password_hash, check_password_hash
+from flask_gravatar import Gravatar
+from flask_login import UserMixin, login_user, LoginManager, current_user, logout_user
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import relationship
-from flask_login import UserMixin, login_user, LoginManager, login_required, current_user, logout_user
+from werkzeug.security import generate_password_hash, check_password_hash
+
 from forms import CreatePostForm, RegisterForm, LoginForm, CommentForm
-from flask_gravatar import Gravatar
-from functools import wraps
-import os
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('APP_SECRET_KEY')
@@ -32,6 +34,7 @@ gravatar = Gravatar(app,
                     force_lower=False,
                     use_ssl=False,
                     base_url=None)
+
 
 # CONFIGURE TABLES
 
@@ -78,6 +81,7 @@ def admin_only(function):
         if not current_user.is_authenticated or current_user.id != 1:
             return abort(403)
         return function(*args, **kwargs)
+
     return wrapper
 
 
